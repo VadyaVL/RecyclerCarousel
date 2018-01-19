@@ -1,0 +1,10 @@
+
+.vs/
+RecyclerCarousel/RecyclerCarousel.Android/obj/
+RecyclerCarousel/RecyclerCarousel.Android/bin/
+RecyclerCarousel/RecyclerCarousel.iOS/obj/
+RecyclerCarousel/RecyclerCarousel.iOS/bin/
+RecyclerCarousel/RecyclerCarousel/obj/
+RecyclerCarousel/RecyclerCarousel/bin/
+RecyclerCarousel/RecyclerCarousel.UWP/obj/
+RecyclerCarousel/RecyclerCarousel.UWP/bin/
