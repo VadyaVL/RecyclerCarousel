@@ -113,7 +113,7 @@ namespace RecyclerCarousel
         /// </summary>
         /// <param name="realPostion">Position in real collection.</param>
         /// <param name="realCount">Count in real collection.</param>
-        private void RealToImagine(int realPostion, int realCount)
+        private void RealToImagine(int realPostion, int realCount, Action action = Action.Init)
         {
             if(realCount <= 0 || realPostion < 0 || realPostion >= realCount)
             {
@@ -137,16 +137,32 @@ namespace RecyclerCarousel
 
             var itemsSourceAsObject = this.ItemsSource.Cast<object>();
 
-            // Clear imagine collection
-            // Insert elements to imagine collection
-            this.Collection.Reset(new List<object>
+            if (action == Action.Init)
             {
-                itemsSourceAsObject.ElementAt(firstIndex),
-                itemsSourceAsObject.ElementAt(secondIndex),
-                itemsSourceAsObject.ElementAt(thirdIndex),
-            });
-            
-            this.Position = 1;  // Position in imagine collection always must be 1
+                // Clear imagine collection
+                // Insert elements to imagine collection
+                this.Collection.Reset(new List<object>
+                {
+                    itemsSourceAsObject.ElementAt(firstIndex),
+                    itemsSourceAsObject.ElementAt(secondIndex),
+                    itemsSourceAsObject.ElementAt(thirdIndex),
+                });
+                this.Position = 1;  // Position in imagine collection always must be 1
+            }
+            else if (action == Action.Right)    // ->
+            {
+                // Remove first
+                this.Collection.RemoveAt(0);
+                // Add last
+                this.Collection.Add(itemsSourceAsObject.ElementAt(thirdIndex));
+            }
+            else                                // <-
+            {
+                // Remove last
+                this.Collection.RemoveAt(2);
+                // Add first
+                this.Collection.Insert(0, itemsSourceAsObject.ElementAt(firstIndex));
+            }
         }
         
         #endregion
@@ -163,10 +179,12 @@ namespace RecyclerCarousel
                 }
 
                 var count = this.Count;
+                var action = Action.Init;
 
                 if (newPosition == 2)    // right
                 {
                     this.RealPosition++;
+                    action = Action.Right;
 
                     if (this.RealPosition >= count)
                     {
@@ -176,6 +194,7 @@ namespace RecyclerCarousel
                 else if (newPosition == 0)  // left
                 {
                     this.RealPosition--;
+                    action = Action.Left;
 
                     if (this.RealPosition < 0)
                     {
@@ -183,8 +202,19 @@ namespace RecyclerCarousel
                     }
                 }
 
-                this.RealToImagine(this.RealPosition, count);
+                this.RealToImagine(this.RealPosition, count, action);
             }
+        }
+
+        #endregion
+
+        #region Enums
+
+        private enum Action
+        {
+            Left,
+            Init,
+            Right
         }
 
         #endregion
