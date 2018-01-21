@@ -147,11 +147,10 @@ namespace RecyclerCarousel
                     itemsSourceAsObject.ElementAt(secondIndex),
                     itemsSourceAsObject.ElementAt(thirdIndex),
                 });
-                this.Position = 1;  // Position in imagine collection always must be 1
             }
             else if (action == Action.Right)    // ->
             {
-                // Remove first
+                // Remove first - bad animation find here
                 this.Collection.RemoveAt(0);
                 // Add last
                 this.Collection.Add(itemsSourceAsObject.ElementAt(thirdIndex));
@@ -163,6 +162,8 @@ namespace RecyclerCarousel
                 // Add first
                 this.Collection.Insert(0, itemsSourceAsObject.ElementAt(firstIndex));
             }
+
+            this.Position = 1;  // Position in imagine collection always must be 1
         }
         
         #endregion
