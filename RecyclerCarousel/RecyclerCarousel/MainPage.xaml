@@ -2,10 +2,23 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:RecyclerCarousel"
-             x:Class="RecyclerCarousel.MainPage">
-
-	<Label Text="Welcome to Xamarin.Forms!" 
-           VerticalOptions="Center" 
-           HorizontalOptions="Center" />
+             x:Class="RecyclerCarousel.MainPage"
+             x:Name="root"
+             
+             BackgroundColor="Black"
+             
+             xmlns:rv="clr-namespace:RecyclerCarousel;assembly=RecyclerCarousel">
+    
+    <StackLayout VerticalOptions="FillAndExpand" BackgroundColor="Gray">
+        <rv:RecyclerCarousel x:Name="recyclerCarousel" ItemsSource="{Binding Source={x:Reference root}, Path=Collection}">
+            <rv:RecyclerCarousel.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout VerticalOptions="FillAndExpand" Margin="20" BackgroundColor="White">
+                        <Label Text="{Binding Text}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+                    </StackLayout>
+                </DataTemplate>
+            </rv:RecyclerCarousel.ItemTemplate>
+        </rv:RecyclerCarousel>
+    </StackLayout>
 
 </ContentPage>

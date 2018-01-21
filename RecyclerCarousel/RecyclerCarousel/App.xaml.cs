@@ -13,7 +13,7 @@ namespace RecyclerCarousel
 		{
 			InitializeComponent();
 
-			MainPage = new RecyclerCarousel.MainPage();
+            MainPage = new global::RecyclerCarousel.MainPage();
 		}
 
 		protected override void OnStart ()
