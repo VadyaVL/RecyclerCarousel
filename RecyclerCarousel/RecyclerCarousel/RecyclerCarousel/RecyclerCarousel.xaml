@@ -7,11 +7,14 @@
              
              xmlns:cv="clr-namespace:Xamarin.Forms;assembly=Xamarin.Forms.CarouselView">
 
-    <Label Text="{Binding Source={x:Reference root}, Path=Position}" HorizontalOptions="CenterAndExpand"/>
+    <Label Text="{Binding Source={x:Reference root}, Path=RealPosition}" HorizontalOptions="CenterAndExpand"/>
 
-    <cv:CarouselView ItemsSource="{Binding Source={x:Reference root}, Path=ItemsSource}"
+    <cv:CarouselView 
+        x:Name="ddd"
+        ItemsSource="{Binding Source={x:Reference root}, Path=Collection}"
                      Position="{Binding Source={x:Reference root}, Path=Position}"
                      ItemTemplate="{Binding Source={x:Reference root}, Path=ItemTemplate}"
-                     VerticalOptions="FillAndExpand" />
+                     VerticalOptions="FillAndExpand"
+                     PositionSelected="OnPositionSelected" />
 
 </StackLayout>

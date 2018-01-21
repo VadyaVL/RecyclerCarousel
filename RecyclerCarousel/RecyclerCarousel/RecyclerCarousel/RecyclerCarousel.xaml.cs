@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace RecyclerCarousel
                         observable.CollectionChanged += (s, a) =>
                         {
                             current.OnPropertyChanged(nameof(current.ItemsSource));
+                            current.RealToImagine(current.realPosition, current.Count);   // Change first param
                         };
                     }
 
@@ -36,6 +38,17 @@ namespace RecyclerCarousel
         #endregion
 
         #region Properies
+        
+        private int realPosition = 0;
+        public int RealPosition
+        {
+            get => this.realPosition;
+            set
+            {
+                this.realPosition = value;
+                this.OnPropertyChanged(nameof(this.RealPosition));
+            }
+        }
 
         public int Position
         {
@@ -55,11 +68,125 @@ namespace RecyclerCarousel
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        public int Count
+        {
+            get
+            {
+                var res = 0;
+
+                if (this.ItemsSource is ICollection collection)
+                {
+                    res = collection.Count;
+                }
+                else
+                {
+                    res = this.ItemsSource.Cast<object>().Count();
+                }
+
+                return res;
+            }
+        }
+
+        // Use 1, 2 or 3 element(-s)
+        // Use range OC
+        private RangeObservableCollection<object> collection = new RangeObservableCollection<object>();
+        public RangeObservableCollection<object> Collection
+        {
+            get => this.collection;
+        }
+
         #endregion
+
+        #region Constructors
 
         public RecyclerCarousel ()
 		{
 			InitializeComponent ();
-		}
-	}
+        }
+        
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// From real list to imagine (with 3 elements)
+        /// </summary>
+        /// <param name="realPostion">Position in real collection.</param>
+        /// <param name="realCount">Count in real collection.</param>
+        private void RealToImagine(int realPostion, int realCount)
+        {
+            if(realCount <= 0 || realPostion < 0 || realPostion >= realCount)
+            {
+                return;
+            }
+
+            // Find index from Collection
+            var firstIndex = realPostion - 1;
+            var secondIndex = realPostion;
+            var thirdIndex = realPostion + 1;
+
+            if(firstIndex < 0)
+            {
+                firstIndex = realCount - 1;
+            }
+
+            if(thirdIndex >= Count)
+            {
+                thirdIndex = 0;
+            }
+
+            var itemsSourceAsObject = this.ItemsSource.Cast<object>();
+
+            // Clear imagine collection
+            // Insert elements to imagine collection
+            this.Collection.Reset(new List<object>
+            {
+                itemsSourceAsObject.ElementAt(firstIndex),
+                itemsSourceAsObject.ElementAt(secondIndex),
+                itemsSourceAsObject.ElementAt(thirdIndex),
+            });
+            
+            this.Position = 1;  // Position in imagine collection always must be 1
+        }
+        
+        #endregion
+
+        #region Events
+
+        private void OnPositionSelected(object sender, SelectedPositionChangedEventArgs args)
+        {
+            if(args.SelectedPosition is int newPosition)
+            {
+                if(newPosition == 1)
+                {
+                    return;
+                }
+
+                var count = this.Count;
+
+                if (newPosition == 2)    // right
+                {
+                    this.RealPosition++;
+
+                    if (this.RealPosition >= count)
+                    {
+                        this.RealPosition = 0;
+                    }
+                }
+                else if (newPosition == 0)  // left
+                {
+                    this.RealPosition--;
+
+                    if (this.RealPosition < 0)
+                    {
+                        this.RealPosition = count - 1;
+                    }
+                }
+
+                this.RealToImagine(this.RealPosition, count);
+            }
+        }
+
+        #endregion
+    }
 }
