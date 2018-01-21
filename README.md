@@ -2,8 +2,12 @@
 
 For Xamarin.Forms.
 
-1. Add: xmlns:rv="clr-namespace:RecyclerCarousel;assembly=RecyclerCarousel"
+1. Add:
+```xml
+xmlns:rv="clr-namespace:RecyclerCarousel;assembly=RecyclerCarousel"
+```xml
 2. Use:
+```xml
 <rv:RecyclerCarousel x:Name="recyclerCarousel" ItemsSource="{Binding Source={x:Reference root}, Path=Collection}">
     <rv:RecyclerCarousel.ItemTemplate>
         <DataTemplate>
@@ -13,6 +17,7 @@ For Xamarin.Forms.
         </DataTemplate>
     </rv:RecyclerCarousel.ItemTemplate>
 </rv:RecyclerCarousel>
+```xml
 
 Dependencies: 
 * [Xamarin.Forms.CarouselView](https://www.nuget.org/packages/Xamarin.Forms.CarouselView/). 
