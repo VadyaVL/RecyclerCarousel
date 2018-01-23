@@ -9,28 +9,34 @@ namespace RecyclerCarousel
     // https://peteohanlon.wordpress.com/2008/10/22/bulk-loading-in-observablecollection/
     public class RangeObservableCollection<T> : ObservableCollection<T>
     {
-        private bool _suppressNotification = false;
+        public bool SuppressNotification { get; set; }
 
         public Func<T, T, bool> TheSameChecker;
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (!_suppressNotification)
+            if (!SuppressNotification)
+            {
                 base.OnCollectionChanged(e);
+            }
         }
-
+        
         public void AddRange(ICollection<T> list)
         {
             if (list == null)
+            {
                 throw new ArgumentNullException("list");
+            }
 
-            _suppressNotification = true;
+            this.SuppressNotification = true;
 
             foreach (T item in list)
             {
                 Add(item);
             }
-            _suppressNotification = false;
+
+            this.SuppressNotification = false;
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
@@ -44,6 +50,38 @@ namespace RecyclerCarousel
             this.Items.Clear();
 
             AddRange(range);
+        }
+
+
+        // Check exceptions. Write safety code.
+
+        //public void RemoveFirstInsertEnd(T newObject)
+        //{
+        //    this.SuppressNotification = true;
+
+        //    this.RemoveAt(0);
+        //    this.Add(newObject);
+
+        //    this.SuppressNotification = false;
+
+        //    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        //}
+
+        //public void RemoveLastInsertFirst(T newObject)
+        //{
+        //    this.SuppressNotification = true;
+
+        //    this.RemoveAt(this.Count - 1);
+        //    this.Insert(0, newObject);
+
+        //    this.SuppressNotification = false;
+
+        //    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        //}
+
+        public void Refresh()
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
 }

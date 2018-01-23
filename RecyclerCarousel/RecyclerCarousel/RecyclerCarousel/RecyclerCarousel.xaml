@@ -5,14 +5,14 @@
              x:Name="root"
              VerticalOptions="FillAndExpand"
              
-             xmlns:cv="clr-namespace:Xamarin.Forms;assembly=Xamarin.Forms.CarouselView">
+             xmlns:local="clr-namespace:RecyclerCarousel">
 
-    <Label Text="{Binding Source={x:Reference root}, Path=RealPosition}" HorizontalOptions="CenterAndExpand"/>
+    <Label Text="{Binding Source={x:Reference root}, Path=Position}" HorizontalOptions="CenterAndExpand"/>
 
-    <cv:CarouselView 
-        x:Name="ddd"
-        ItemsSource="{Binding Source={x:Reference root}, Path=Collection}"
-                     Position="{Binding Source={x:Reference root}, Path=Position}"
+    <local:CustomCarousel 
+                     x:Name="customCarousel"
+                     ItemsSource="{Binding Source={x:Reference root}, Path=Collection}"
+                     Position="{Binding Source={x:Reference root}, Path=ImaginePosition}"
                      ItemTemplate="{Binding Source={x:Reference root}, Path=ItemTemplate}"
                      VerticalOptions="FillAndExpand"
                      PositionSelected="OnPositionSelected" />

@@ -8,5 +8,11 @@
         {
             this.Text = string.Empty;
         }
+
+        // For Debug WriteLine
+        public override string ToString()
+        {
+            return this.Text;
+        }
     }
 }

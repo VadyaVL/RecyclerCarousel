@@ -19,6 +19,12 @@
                 </DataTemplate>
             </rv:RecyclerCarousel.ItemTemplate>
         </rv:RecyclerCarousel>
+
+        <StackLayout Orientation="Horizontal" VerticalOptions="EndAndExpand">
+            <Button Text="Reset" Clicked="OnClickReset"/>
+            <Button Text="Add" Clicked="OnClickAdd"/>
+        </StackLayout>
+        
     </StackLayout>
 
 </ContentPage>

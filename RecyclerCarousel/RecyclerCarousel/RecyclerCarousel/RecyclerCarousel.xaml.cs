@@ -1,4 +1,9 @@
-﻿using System.Collections;
+﻿/*
+ * 
+ * 
+ */
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -13,10 +18,24 @@ namespace RecyclerCarousel
     {
         #region Bindable Properies
 
+        /// <summary>
+        /// Position of current element.
+        /// </summary>
         public static readonly BindableProperty PositionProperty = BindableProperty.Create(nameof(Position), typeof(int), typeof(RecyclerCarousel), 0, BindingMode.TwoWay);
 
+        /// <summary>
+        /// Imagine position in carriage of three elements.
+        /// </summary>
+        public static readonly BindableProperty ImaginePositionProperty = BindableProperty.Create(nameof(ImaginePosition), typeof(int), typeof(RecyclerCarousel), 0, BindingMode.TwoWay);
+
+        /// <summary>
+        /// Template for showing.
+        /// </summary>
         public static readonly BindableProperty ItemTemplateProperty = BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(RecyclerCarousel), null, BindingMode.TwoWay);
 
+        /// <summary>
+        /// List of objects.
+        /// </summary>
         public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IEnumerable), typeof(RecyclerCarousel), Enumerable.Empty<object>(), BindingMode.TwoWay, null,
             propertyChanged: (bindable, oldvalue, newvalue) =>
             {
@@ -27,7 +46,7 @@ namespace RecyclerCarousel
                         observable.CollectionChanged += (s, a) =>
                         {
                             current.OnPropertyChanged(nameof(current.ItemsSource));
-                            current.RealToImagine(current.realPosition, current.Count);   // Change first param
+                            current.CollectionToImagine(current.Position, current.Count);   // Change first param
                         };
                     }
 
@@ -38,22 +57,17 @@ namespace RecyclerCarousel
         #endregion
 
         #region Properies
-        
-        private int realPosition = 0;
-        public int RealPosition
-        {
-            get => this.realPosition;
-            set
-            {
-                this.realPosition = value;
-                this.OnPropertyChanged(nameof(this.RealPosition));
-            }
-        }
 
         public int Position
         {
             get => (int)this.GetValue(PositionProperty);
             set => this.SetValue(PositionProperty, value);
+        }
+
+        public int ImaginePosition
+        {
+            get => (int)this.GetValue(ImaginePositionProperty);
+            set => this.SetValue(ImaginePositionProperty, value);
         }
 
         public DataTemplate ItemTemplate
@@ -68,6 +82,7 @@ namespace RecyclerCarousel
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        // Count of objects
         public int Count
         {
             get
@@ -87,13 +102,18 @@ namespace RecyclerCarousel
             }
         }
 
-        // Use 1, 2 or 3 element(-s)
-        // Use range OC
+        // Carriage of three elements
         private RangeObservableCollection<object> collection = new RangeObservableCollection<object>();
-        public RangeObservableCollection<object> Collection
-        {
-            get => this.collection;
-        }
+        public RangeObservableCollection<object> Collection { get => this.collection; }
+
+        public object PreviewItem { get => this.customCarousel.LastItem; }
+
+        public object CurrentItem { get => this.customCarousel.Item; }
+
+        /// <summary>
+        /// Get PreviewItem.
+        /// </summary>
+        public event Action<object> PositionChanged;
 
         #endregion
 
@@ -103,17 +123,19 @@ namespace RecyclerCarousel
 		{
 			InitializeComponent ();
         }
-        
+
         #endregion
 
         #region Methods
 
+        // WHAT_DO: CHECK RESET AND ADD NEW ELEMENTS
+
         /// <summary>
-        /// From real list to imagine (with 3 elements)
+        /// From list of objects to imagine (carriage of three elements)
         /// </summary>
-        /// <param name="realPostion">Position in real collection.</param>
-        /// <param name="realCount">Count in real collection.</param>
-        private void RealToImagine(int realPostion, int realCount, Action action = Action.Init)
+        /// <param name="realPostion">Position in collection.</param>
+        /// <param name="realCount">Count in collection.</param>
+        private void CollectionToImagine(int realPostion, int realCount, Action action = Action.Init)
         {
             if(realCount <= 0 || realPostion < 0 || realPostion >= realCount)
             {
@@ -147,32 +169,50 @@ namespace RecyclerCarousel
                     itemsSourceAsObject.ElementAt(secondIndex),
                     itemsSourceAsObject.ElementAt(thirdIndex),
                 });
+
+                this.ImaginePosition = 1;  // Position in imagine collection always must be 1
             }
             else if (action == Action.Right)    // ->
             {
+                //this.Collection.RemoveFirstInsertEnd(itemsSourceAsObject.ElementAt(thirdIndex));
                 // Remove first - bad animation find here
                 this.Collection.RemoveAt(0);
                 // Add last
-                this.Collection.Add(itemsSourceAsObject.ElementAt(thirdIndex));
+                this.Collection.Insert(2, itemsSourceAsObject.ElementAt(thirdIndex));
+
+                //this.Collection.Move(1, 0);
+                //this.Collection.RemoveAt(1);
+                //this.Collection.Insert(2, itemsSourceAsObject.ElementAt(thirdIndex));
             }
             else                                // <-
             {
+                //this.Collection.RemoveLastInsertFirst(itemsSourceAsObject.ElementAt(firstIndex));
                 // Remove last
                 this.Collection.RemoveAt(2);
                 // Add first
                 this.Collection.Insert(0, itemsSourceAsObject.ElementAt(firstIndex));
             }
-
-            this.Position = 1;  // Position in imagine collection always must be 1
         }
         
+        public void Reset()
+        {
+            this.Position = 0;
+            this.CollectionToImagine(this.Position, this.Count);
+        }
+
         #endregion
 
         #region Events
 
         private void OnPositionSelected(object sender, SelectedPositionChangedEventArgs args)
         {
-            if(args.SelectedPosition is int newPosition)
+#if DEBUG
+            // If position changed we could get preview selected item.
+            System.Diagnostics.Debug.WriteLine(this.PreviewItem);
+#endif
+            this.PositionChanged?.Invoke(this.PreviewItem);
+
+            if (args.SelectedPosition is int newPosition)
             {
                 if(newPosition == 1)
                 {
@@ -184,26 +224,26 @@ namespace RecyclerCarousel
 
                 if (newPosition == 2)    // right
                 {
-                    this.RealPosition++;
+                    this.Position++;
                     action = Action.Right;
 
-                    if (this.RealPosition >= count)
+                    if (this.Position >= count)
                     {
-                        this.RealPosition = 0;
+                        this.Position = 0;
                     }
                 }
                 else if (newPosition == 0)  // left
                 {
-                    this.RealPosition--;
+                    this.Position--;
                     action = Action.Left;
 
-                    if (this.RealPosition < 0)
+                    if (this.Position < 0)
                     {
-                        this.RealPosition = count - 1;
+                        this.Position = count - 1;
                     }
                 }
 
-                this.RealToImagine(this.RealPosition, count, action);
+                this.CollectionToImagine(this.Position, count, action);
             }
         }
 
