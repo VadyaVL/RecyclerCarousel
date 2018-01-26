@@ -11,7 +11,7 @@ namespace RecyclerCarousel
         {
 
         }
-
+        
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.OnPropertyChanged(propertyName);

@@ -15,6 +15,7 @@
                      Position="{Binding Source={x:Reference root}, Path=ImaginePosition}"
                      ItemTemplate="{Binding Source={x:Reference root}, Path=ItemTemplate}"
                      VerticalOptions="FillAndExpand"
-                     PositionSelected="OnPositionSelected" />
+                     PositionSelected="OnPositionSelected"
+                     ItemSelected="OnItemSelected"/>
 
 </StackLayout>

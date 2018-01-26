@@ -45,7 +45,6 @@ namespace RecyclerCarousel
                     {
                         observable.CollectionChanged += (s, a) =>
                         {
-                            current.OnPropertyChanged(nameof(current.ItemsSource));
                             current.CollectionToImagine(current.Position, current.Count);   // Change first param
                         };
                     }
@@ -108,7 +107,7 @@ namespace RecyclerCarousel
 
         public object PreviewItem { get => this.customCarousel.LastItem; }
 
-        public object CurrentItem { get => this.customCarousel.Item; }
+        public object CurrentItem { get => this.customCarousel.Item;  }
 
         /// <summary>
         /// Get PreviewItem.
@@ -129,6 +128,7 @@ namespace RecyclerCarousel
         #region Methods
 
         // WHAT_DO: CHECK RESET AND ADD NEW ELEMENTS
+        // BUG: While we just shuffle, add new item (maybe remove too) and reset  - customCarousel won't update itself.
 
         /// <summary>
         /// From list of objects to imagine (carriage of three elements)
@@ -161,14 +161,31 @@ namespace RecyclerCarousel
 
             if (action == Action.Init)
             {
-                // Clear imagine collection
-                // Insert elements to imagine collection
-                this.Collection.Reset(new List<object>
+                var listToInsert = new List<object>
                 {
                     itemsSourceAsObject.ElementAt(firstIndex),
                     itemsSourceAsObject.ElementAt(secondIndex),
                     itemsSourceAsObject.ElementAt(thirdIndex),
-                });
+                };
+
+                var reinit = this.Collection.Count == 0;
+
+                if (!reinit)
+                {
+                    var theSame = true;
+
+                    for (int i = 0; i < 3 && theSame; i++)
+                    {
+                        theSame &= this.Collection[i].Equals(listToInsert[i]);
+                    }
+
+                    reinit = !theSame; 
+                }
+
+                if (reinit)
+                {
+                    this.Collection.Reset(listToInsert);
+                }
 
                 this.ImaginePosition = 1;  // Position in imagine collection always must be 1
             }
@@ -197,12 +214,18 @@ namespace RecyclerCarousel
         public void Reset()
         {
             this.Position = 0;
+            this.ImaginePosition = 0;
             this.CollectionToImagine(this.Position, this.Count);
         }
 
         #endregion
 
         #region Events
+
+        private void OnItemSelected(object sender, SelectedPositionChangedEventArgs args)
+        {
+
+        }
 
         private void OnPositionSelected(object sender, SelectedPositionChangedEventArgs args)
         {

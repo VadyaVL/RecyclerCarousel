@@ -1,6 +1,7 @@
 ﻿using RecyclerCarousel.ViewModels;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Xamarin.Forms;
 
 namespace RecyclerCarousel
@@ -10,8 +11,8 @@ namespace RecyclerCarousel
     // Check how it works with a difficult templates.
     public partial class MainPage : ContentPage
     {
-        private ObservableCollection<WordVm> collection = new ObservableCollection<WordVm>();
-        public ObservableCollection<WordVm> Collection
+        private RangeObservableCollection<WordVm> collection = new RangeObservableCollection<WordVm>();
+        public RangeObservableCollection<WordVm> Collection
         {
             get => this.collection;
         }
@@ -24,11 +25,6 @@ namespace RecyclerCarousel
             this.Collection.Add(new WordVm { Text = "Word 2" });
             this.Collection.Add(new WordVm { Text = "Word 3" });
             this.Collection.Add(new WordVm { Text = "Word 4" });
-            this.Collection.Add(new WordVm { Text = "Word 5" });
-            this.Collection.Add(new WordVm { Text = "Word 6" });
-            this.Collection.Add(new WordVm { Text = "Word 7" });
-            this.Collection.Add(new WordVm { Text = "Word 8" });
-            this.Collection.Add(new WordVm { Text = "Word 9" });
         }
 
         #region Events
@@ -41,6 +37,11 @@ namespace RecyclerCarousel
         private void OnClickAdd(object sender, EventArgs args)
         {
             this.Collection.Add(new WordVm { Text = "Word " + (this.Collection.Count + 1) });
+        }
+
+        private void OnClickShuffle(object sender, EventArgs args)
+        {
+            this.Collection.Reset(this.Collection.OrderBy(_ => Guid.NewGuid()).ToList());
         }
 
         #endregion

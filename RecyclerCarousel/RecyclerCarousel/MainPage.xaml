@@ -23,6 +23,7 @@
         <StackLayout Orientation="Horizontal" VerticalOptions="EndAndExpand">
             <Button Text="Reset" Clicked="OnClickReset"/>
             <Button Text="Add" Clicked="OnClickAdd"/>
+            <Button Text="Shuffle" Clicked="OnClickShuffle"/>
         </StackLayout>
         
     </StackLayout>
